@@ -6,8 +6,9 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
-from qwen_vl_utils import process_vision_info
+from paddleocr import PaddleOCR
+from PIL import Image
+import numpy as np
 
 from langchain import LLMChain, PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -15,6 +16,60 @@ from pymilvus import MilvusClient
 import google.generativeai as genai
 
 class DocumentIntelligencePipeline:
+    """
+    DocumentIntelligencePipeline
+
+    A comprehensive pipeline that automates document processing using OCR, text classification,
+    summarization, semantic search, and notification functionalities.
+
+    Key Functionalities:
+    ---------------------
+    1. *OCR (Optical Character Recognition)*:
+        - Extracts text from image-based documents using PaddleOCR.
+        - Supports various image formats such as PNG, JPG, JPEG, BMP, and TIFF.
+
+    2. *Text Classification & Summarization*:
+        - Classifies documents into categories (e.g., "Email", "Invoice", etc.) using Google Gemini LLM.
+        - Generates a brief summary of the document using another Gemini-based LLM chain.
+
+    3. *Semantic Embedding & Storage*:
+        - Generates semantic embeddings for document text using Google’s embedding model.
+        - Stores document metadata, content, embeddings, and summaries in Milvus vector database.
+        - Automatically creates the Milvus collection if it does not exist.
+
+    4. *Semantic Search*:
+        - Accepts user queries and returns the most relevant stored documents using vector similarity.
+
+    5. *Email Notification*:
+        - Sends an email notification when a new document is processed and categorized.
+        - Uses SMTP protocol with predefined Gmail credentials.
+
+    Components:
+    -----------
+    - *PaddleOCR*: For extracting text from images.
+    - *Google Gemini API*: For document classification and summarization.
+    - *Milvus*: For storing and searching document vectors.
+    - *SMTP*: For email alerts to notify about processed document types.
+
+    Methods:
+    --------
+    - extract_text_from_image(image_path): Extracts text from image files using PaddleOCR.
+    - analyze_document(text): Uses Gemini to classify and summarize document content.
+    - process_and_store(file_path): Complete pipeline to extract, analyze, embed, and store a document.
+    - send_email_notification(email, document_name, category): Notifies the user via email of the document's category.
+    - milvus_search(question): Accepts a natural language query and retrieves the most relevant document from the Milvus DB.
+
+    Usage Example:
+    --------------
+    >>> pipeline = DocumentIntelligencePipeline()
+    >>> pipeline.process_and_store("invoice.png")
+    >>> results = pipeline.milvus_search("show me my job applications")
+    >>> print(results)
+
+    This class enables automated document workflows for intelligent search, retrieval, and alerting.
+    Ideal for use cases in digital archives, document management systems, and enterprise automation.
+
+    """
     def _init_(self):
         # === Setup APIs and Models ===
         self._setup_gemini_api()
@@ -38,39 +93,25 @@ class DocumentIntelligencePipeline:
         self.APP_PASSWORD = ""
 
     def _setup_ocr(self):
-        self.ocr_model = Qwen2VLForConditionalGeneration.from_pretrained(
-            "prithivMLmods/Qwen2-VL-OCR-2B-Instruct", torch_dtype="auto", device_map="auto"
-        )
-        self.ocr_processor = AutoProcessor.from_pretrained(
-            "prithivMLmods/Qwen2-VL-OCR-2B-Instruct",
-            size={"shortest_edge": 56 * 56, "longest_edge": 28 * 28 * 1280}
-        )
+        self.ocr = PaddleOCR(lang='en')  
+
 
     def _setup_milvus(self):
         self.milvus_client = MilvusClient("milvus_demo.db")
 
     # === OCR Extraction ===
     def extract_text_from_image(self, image_path):
-        messages = [{
-            "role": "user",
-            "content": [
-                {"type": "image", "image": image_path},
-                {"type": "text", "text": "Extract the text from the image."}
-            ]
-        }]
-        prompt = self.ocr_processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        image_inputs, video_inputs = process_vision_info(messages)
-        inputs = self.ocr_processor(
-            text=[prompt],
-            images=image_inputs,
-            videos=video_inputs,
-            padding=True,
-            return_tensors="pt"
-        )
-        generated_ids = self.ocr_model.generate(**inputs, max_new_tokens=128)
-        trimmed = [out[len(in_):] for in_, out in zip(inputs.input_ids, generated_ids)]
-        decoded = self.ocr_processor.batch_decode(trimmed, skip_special_tokens=True)
-        return " ".join(decoded).replace("<|im_end|>", "")
+        cropped_img = Image.open(image_path)
+        cropped_img_np = np.array(cropped_img) 
+
+        result = self.ocr.ocr(cropped_img_np) 
+        results = []
+        for idx in range(len(result)):
+            res = result[idx]
+            for line in res:
+                results.append(line[1][0])
+
+        return " ".join(results)
 
     # === Document Analysis (Classification + Summarization) ===
     def analyze_document(self, text):

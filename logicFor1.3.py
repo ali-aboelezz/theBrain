@@ -53,7 +53,7 @@ class SecretaryAgent:
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
         self.email_address = "Elmadany11149@gmail.com"
-        self.email_password = "jley xtrn rtbz mkte"
+        self.email_password = "email APP password"
         
         # Setup LangChain Pydantic parser
         self.parser = PydanticOutputParser(pydantic_object=TaskList)

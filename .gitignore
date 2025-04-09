@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# @azooz95 ignoring
+assests/database/milvus_demo.db
+assests/database/.milvus_demo.db.lock
+assests/database/test.ipynb
+.tar
+.onnx
+.pt
+.ods
+.xlsx
+

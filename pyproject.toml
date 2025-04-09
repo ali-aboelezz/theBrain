@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "theBrain"
+version = "0.1.0"
+description = "My FastAPI Project"
+authors = [{name = "Smart Solution Departments", email = "aabdoh@joe13th.com"}]
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+
+dependencies = [
+    "fastapi>=0.95.0",
+    "uvicorn>=0.21.0",
+    "opencv-python>=4.11.0.86",
+    "torch",
+    "torchvision",
+    "torchaudio",
+    "onnxruntime",
+    "onnx", 
+    "google-genai",
+    "cnocr[ort-cpu]",
+    "openpyxl", 
+    "python-dotenv"
+    # Add other dependencies here
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=3.0",
+    "httpx>=0.23.0",       # For async test clients
+    "black>=22.0",         # Code formatting
+    "isort>=5.0",          # Import sorting
+    "mypy>=1.0"            # Static typing
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=3.0",
+    "httpx>=0.23.0"
+]
+
+gpu = [
+    "onnxruntime-gpu"
+
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/yourproject"
+
+[tool.pip]
+index-url = "https://download.pytorch.org/whl/cu118"
+
+
+[tool.setuptools]
+packages = ["app"]
+package-dir = {"" = "src"}

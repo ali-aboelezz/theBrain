@@ -5,7 +5,7 @@ import os
 @dataclass
 class FilePaths():
     script_path: str = Path(__file__).resolve()
-    paper_seg_model : str = script_path.parents[1] / 'src/assests/models/similified_model.onnx'
+    paper_seg_model : str = script_path.parents[1] / 'similified_model_paper_seg.onnx'
     data_base_path: str = script_path.parents[1] / 'src/assests/data/'
 
     def __post_init__(self):

@@ -23,7 +23,15 @@ dependencies = [
     "google-genai",
     "cnocr[ort-cpu]",
     "openpyxl", 
-    "python-dotenv"
+    "python-dotenv",
+    "paddlepaddle",
+    "paddleocr",
+    "langchain_community",
+    "langchain-google-genai",
+    "pymilvus",
+    ""pymilvus[model]""
+
+
     # Add other dependencies here
 ]
 

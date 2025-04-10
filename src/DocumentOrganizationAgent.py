@@ -6,9 +6,7 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from paddleocr import PaddleOCR
-from PIL import Image
-import numpy as np
+from utils.text_extractor import TextImgExtractor
 
 from langchain import LLMChain, PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -74,9 +72,9 @@ class DocumentIntelligencePipeline:
         # === Setup APIs and Models ===
         self._setup_gemini_api()
         self._setup_email()
-        self._setup_ocr()
         self._setup_milvus()
         self.col_name = "documents_collection"
+        self.text_extractor = TextImgExtractor(engine="paddleocr")
 
     def _setup_gemini_api(self):
         os.environ["GOOGLE_API_KEY"] = ''
@@ -92,8 +90,6 @@ class DocumentIntelligencePipeline:
         self.EMAIL_ADDRESS = ""
         self.APP_PASSWORD = ""
 
-    def _setup_ocr(self):
-        self.ocr = PaddleOCR(lang='en')  
 
 
     def _setup_milvus(self):
@@ -101,17 +97,7 @@ class DocumentIntelligencePipeline:
 
     # === OCR Extraction ===
     def extract_text_from_image(self, image_path):
-        cropped_img = Image.open(image_path)
-        cropped_img_np = np.array(cropped_img) 
-
-        result = self.ocr.ocr(cropped_img_np) 
-        results = []
-        for idx in range(len(result)):
-            res = result[idx]
-            for line in res:
-                results.append(line[1][0])
-
-        return " ".join(results)
+        return self.text_extractor.extract_text_paddleocr(image_path)
 
     # === Document Analysis (Classification + Summarization) ===
     def analyze_document(self, text):

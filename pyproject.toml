@@ -23,7 +23,8 @@ dependencies = [
     "google-genai",
     "cnocr[ort-cpu]",
     "openpyxl", 
-    "python-dotenv"
+    "python-dotenv",
+
     # Add other dependencies here
 ]
 
@@ -48,7 +49,7 @@ gpu = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/yourproject"
+Homepage = "https://github.com/azooz95/theBrain"
 
 [tool.pip]
 index-url = "https://download.pytorch.org/whl/cu118"

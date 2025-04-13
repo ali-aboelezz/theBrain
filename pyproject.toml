@@ -29,8 +29,7 @@ dependencies = [
     "langchain_community",
     "langchain-google-genai",
     "pymilvus",
-    ""pymilvus[model]""
-
+    "pymilvus[model]"
 
     # Add other dependencies here
 ]
@@ -56,7 +55,7 @@ gpu = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/yourproject"
+Homepage = "https://github.com/azooz95/theBrain"
 
 [tool.pip]
 index-url = "https://download.pytorch.org/whl/cu118"

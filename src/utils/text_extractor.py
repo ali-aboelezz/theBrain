@@ -1,17 +1,30 @@
 
 from cnocr import CnOcr
+from paddleocr import PaddleOCR
+from PIL import Image
 import numpy as np 
 from typing import Optional
 
 class TextImgExtractor():
 
-    def __init__(self, detection_model_name:str = "en_PP-OCRv3_det", 
-                 rec_model_name:str ="n_number_mobile_v2.0"):
-        
-        self.ocr = CnOcr(det_model_name='en_PP-OCRv3_det', rec_model_name='en_number_mobile_v2.0')
+    def _init_(self,
+                 engine: str = "cnocr",  # 'cnocr' or 'paddleocr'
+                 detection_model_name: str = "en_PP-OCRv3_det",
+                 rec_model_name: str = "n_number_mobile_v2.0"):
+        self.engine = engine.lower()
+        self.detection_model_name = detection_model_name
+        self.rec_model_name = rec_model_name
+        self._setup_ocr()
 
-        # self.ocr = CnOcr(det_model_name=detection_model_name, 
-        #                  rec_model_name=rec_model_name)
+    def _setup_ocr(self):
+        if self.engine == "cnocr":
+            self.ocr = CnOcr(det_model_name=self.detection_model_name,
+                             rec_model_name=self.rec_model_name)
+        elif self.engine == "paddleocr":
+            self.ocr = PaddleOCR(lang='en')
+        else:
+            raise ValueError("Unsupported OCR engine. Choose 'cnocr' or 'paddleocr'.")
+        
 
     def _extract_text(self, outputs:list, scores_indces:Optional[list])->list:
         txts = [line['text'] for line in outputs]
@@ -66,15 +79,32 @@ class TextImgExtractor():
 
         return texts, boxes, scores
     
+    def extract_text_paddleocr(self, image_path):
+        cropped_img = Image.open(image_path)
+        cropped_img_np = np.array(cropped_img) 
+
+        result = self.ocr.ocr(cropped_img_np) 
+        results = []
+        for idx in range(len(result)):
+            res = result[idx]
+            for line in res:
+                results.append(line[1][0])
+
+        return " ".join(results)
 
 if __name__ == "__main__":
-    from image_handler import ImageHandler
+    import os
+    from image_handler import ImageHandler  
 
-    text_extractor = TextImgExtractor()
+    image_path = "/home/azooz/mydisk/ocr_invoices/imgs/254.jpg"
+    img = ImageHandler.read_img(image_path, return_numpy=True)
 
-    img = ImageHandler.read_img('/home/azooz/mydisk/ocr_invoices/imgs/254.jpg', return_numpy=True)
+    print("=== Using CnOCR ===")
+    cnocr_extractor = TextImgExtractor(engine="cnocr")
+    texts, _, _ = cnocr_extractor.extract(img, score_threshold=0.5)
+    print("Extracted Texts (CnOCR):", texts)
 
-    print(img.shape)
-    texts,_,_ = text_extractor.ocr_img_text(img, score_threshold=0.5)
-    print(texts)        
-
+    print("\n=== Using PaddleOCR ===")
+    paddle_extractor = TextImgExtractor(engine="paddleocr")
+    paddle_text = paddle_extractor.extract_text_paddleocr(image_path)
+    print("Extracted Text (PaddleOCR):", paddle_text)

@@ -1,38 +1,65 @@
-
-import os
 import pytest
-from document_pipeline import DocumentIntelligencePipeline
+from src.DocumentOrganizationAgent import DocumentIntelligencePipeline
 
 @pytest.fixture(scope="module")
 def pipeline():
     pipeline = DocumentIntelligencePipeline()
-    pipeline._init_()  # Ensure internal setup is called
+    pipeline.__init__()  
     return pipeline
 
-def test_text_extraction_from_image(pipeline):
-    sample_image_path = "/content/drive/MyDrive/datasets/text_inout/Screen Shot 2025-03-20 at 11.23.06 AM.png"
-    if not os.path.exists(sample_image_path):
-        pytest.skip(f"Sample image not found: {sample_image_path}")
-    text = pipeline.extract_text_from_image(sample_image_path)
-    assert isinstance(text, str) and len(text) > 0
+# ========== NEGATIVE CASES (Expect category to be 'non-sense') ==========
 
+def test_empty_text_input(pipeline):
+    text = ""
+    result = pipeline.analyze_document(text)
+    assert result["document_category"].lower() == "non-sense"
+    assert result["summary"] != ""
 
+def test_meaningless_text_input(pipeline):
+    text = "asdf asdf asdf lkjf lkjf lkjf"
+    result = pipeline.analyze_document(text)
+    assert result["document_category"].lower() == "non-sense"
+    assert result["summary"] != ""
 
-def test_email_notification(pipeline):
-    result = pipeline.send_email(
-        receiver_email="sinbadx22@gmail.com",  
-        subject="Test Email from Pipeline",
-        body="This is a test email from the document intelligence pipeline."
-    )
-    assert "Email sent successfully" in result or "Error:" in result
+def test_random_symbol_input(pipeline):
+    text = "@#$%^&*()_+}{[]"
+    result = pipeline.analyze_document(text)
+    assert result["document_category"].lower() == "non-sense"
+    assert result["summary"] != ""
 
-def test_document_processing_and_storage(pipeline):
-    sample_txt = "/content/drive/MyDrive/datasets/text_inout/recognized2.txt"
-    if not os.path.exists(sample_txt):
-        pytest.skip(f"Sample text file not found: {sample_txt}")
-    pipeline.process_and_store(sample_txt)
+# ========== POSITIVE CASES ==========
 
-def test_smart_search(pipeline):
-    question = "meeting"
-    result = pipeline.search_documents(question)
-    assert isinstance(result, list)
+def test_similar_job_application_1(pipeline):
+    text = """Dear HR Team,
+    I’m writing to apply for the role of Data Scientist at your company.
+    I have 3 years of experience in machine learning and data analysis.
+    I’m eager to bring my skills to your innovative team.
+    Best regards, John"""
+    result = pipeline.analyze_document(text)
+    assert result["document_category"].lower() not in ["non-sense", ""]
+    assert result["summary"] != ""
+    return result["document_category"].lower()
+
+def test_similar_job_application_2(pipeline):
+    text = """Dear Hiring Manager,
+    I’m excited to apply for the AI Engineer role.
+    My background in NLP, deep learning, and Python development aligns with your needs.
+    Looking forward to contributing to your team.
+    Best, Ali"""
+    result = pipeline.analyze_document(text)
+    assert result["document_category"].lower() not in ["non-sense", ""]
+    assert result["summary"] != ""
+    return result["document_category"].lower()
+
+def test_category_consistency_for_valid_inputs(pipeline):
+    cat1 = test_similar_job_application_1(pipeline)
+    cat2 = test_similar_job_application_2(pipeline)
+    assert cat1 == cat2, f"Expected same category, but got '{cat1}' and '{cat2}'"
+
+# ========== SEMANTICALLY AMBIGUOUS INPUT ==========
+
+def test_ambiguous_text_input(pipeline):
+    text = "The system calculates the revenue based on past trends. Efficiency must be optimized."
+    result = pipeline.analyze_document(text)
+    assert result["document_category"].lower() not in ["", None]
+    assert result["summary"] != ""

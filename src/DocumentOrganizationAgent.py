@@ -68,7 +68,7 @@ class DocumentIntelligencePipeline:
     Ideal for use cases in digital archives, document management systems, and enterprise automation.
 
     """
-    def _init_(self):
+    def __init__(self):
         # === Setup APIs and Models ===
         self._setup_gemini_api()
         self._setup_email()
@@ -77,7 +77,7 @@ class DocumentIntelligencePipeline:
         self.text_extractor = TextImgExtractor(engine="paddleocr")
 
     def _setup_gemini_api(self):
-        os.environ["GOOGLE_API_KEY"] = ''
+        os.environ["GOOGLE_API_KEY"] = '' #need to add Gemini API Key
         genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
         self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=500, timeout=None,
         max_retries=2,
@@ -103,24 +103,24 @@ class DocumentIntelligencePipeline:
     def analyze_document(self, text):
         classification_prompt = PromptTemplate(
             input_variables=["text"],
-            template="""You are an expert in Text Classification. You excel at breaking down complex documents into categories.
-                    classify the provided document and determine its category.
-                    Your classification should assign category labels to make it clear for the reader to determine the kind of document.
-                    Classify the document in one word.
+            template="""
+                  classify the provided document into **one of the predefined categories only**. 
 
-                    example:
-                    Dear Hiring Manager,
+                  Strict Instructions:
+                  - Choose ONLY from the following categories: [email, invoice, report, legal, resume, article, non-sense]
+                  - If the text is meaningless, empty, or random characters, classify it as **non-sense**
+                  - DO NOT invent new categories
+                  - DO NOT add explanation — return only the category in lowercase
 
-                    I am excited to apply for the AI Intern position . With about one year of experience in NLP, ML, and Deep Learning, I have developed and deployed models for machine translation, sentiment analysis, and named entity recognition using cutting-edge frameworks like PyTorch and keras. My strong Python and scikit-learn skills, make me a strong fit for your team.
+                  Examples:
+                  1. "Dear Hiring Manager, I am applying for the data science position..."  
+                    → email
 
-                    I welcome the opportunity to discuss how my skills align with your goals.
+                  2. "asdf asdf jkljlkj"  
+                    → non-sense
 
-                    Best regards,
-                    Ali
-                    document category: E-mail
-
-                    Text to classify: {text}
-                    """
+                  Text to classify: {text}
+                  """
         )
         classify_chain = LLMChain(llm=self.llm, prompt=classification_prompt, output_key="document_category")
 
@@ -182,6 +182,12 @@ class DocumentIntelligencePipeline:
 
         analysis = self.analyze_document(text)
         category, summary = analysis["document_category"], analysis["summary"]
+
+        if category.lower() == "non-sense":
+           print("⚠️  This document was categorized as 'non-sense' and will not be stored.")
+           print("Please provide a valid document with meaningful content.")
+           return  # Exit early
+    
         file_name, file_format = self.extract_metadata(file_path)
 
         vector = genai.embed_content(model="models/text-embedding-004", content=text)["embedding"]
@@ -208,7 +214,7 @@ class DocumentIntelligencePipeline:
                 "date": datetime.now().isoformat()
             }]
         )
-        print(f"✅ Saved to Milvus: {res}")
+        print(f"✅ The Document Has Been Saved : {res}")
 
     # === Smart Search ===
     def search_documents(self, question):

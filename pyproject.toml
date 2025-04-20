@@ -29,7 +29,9 @@ dependencies = [
     "langchain_community",
     "langchain-google-genai",
     "pymilvus",
-    "pymilvus[model]"
+    "pymilvus[model]",
+    "pytest",
+    "pytest-mock"
 
     # Add other dependencies here
 ]

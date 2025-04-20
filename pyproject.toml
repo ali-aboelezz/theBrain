@@ -31,7 +31,8 @@ dependencies = [
     "pymilvus",
     "pymilvus[model]",
     "pytest",
-    "pytest-mock"
+    "pytest-mock", 
+    "google-generativeai"
 
     # Add other dependencies here
 ]

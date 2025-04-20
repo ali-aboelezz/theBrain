@@ -13,6 +13,10 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pymilvus import MilvusClient
 import google.generativeai as genai
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 class DocumentIntelligencePipeline:
     """
     DocumentIntelligencePipeline
@@ -77,8 +81,7 @@ class DocumentIntelligencePipeline:
         self.text_extractor = TextImgExtractor(engine="paddleocr")
 
     def _setup_gemini_api(self):
-        os.environ["GOOGLE_API_KEY"] = '' #need to add Gemini API Key
-        genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
         self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=500, timeout=None,
         max_retries=2,
         seed=42,

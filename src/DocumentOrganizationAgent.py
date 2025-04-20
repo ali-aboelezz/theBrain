@@ -110,8 +110,9 @@ class DocumentIntelligencePipeline:
                   classify the provided document into **one of the predefined categories only**. 
 
                   Strict Instructions:
-                  - Choose ONLY from the following categories: [email, invoice, report, legal, resume, article, non-sense]
+                  - Choose ONLY from the following categories: [email, invoice, report, legal, resume, article, non-sense, other]
                   - If the text is meaningless, empty, or random characters, classify it as **non-sense**
+                  - If you can not determine exactly the category, classify it as **other**
                   - DO NOT invent new categories
                   - DO NOT add explanation — return only the category in lowercase
 
@@ -190,6 +191,10 @@ class DocumentIntelligencePipeline:
            print("⚠️  This document was categorized as 'non-sense' and will not be stored.")
            print("Please provide a valid document with meaningful content.")
            return  # Exit early
+        
+        if category.lower() == "other":
+           print("⚠️  This document was classified as 'other'. Please enter the correct category manually.")
+           category = input("Enter the correct category  ").strip().lower()
     
         file_name, file_format = self.extract_metadata(file_path)
 

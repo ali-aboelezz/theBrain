@@ -8,7 +8,7 @@ from typing import Optional
 class TextImgExtractor():
 
     def __init__(self,
-                 engine: str = "cnocr",  # 'cnocr' or 'paddleocr'
+                 engine: str = "cnocr",  # 'cnocr' or 'paddleocr' engine
                  detection_model_name: str = "en_PP-OCRv3_det",
                  rec_model_name: str = "n_number_mobile_v2.0"):
         self.engine = engine.lower()

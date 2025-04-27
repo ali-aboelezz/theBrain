@@ -55,9 +55,9 @@ class EverythingExtractor():
         enhanced_img = ExtractorPipline.RemoveBackground.method_class().run(paper_detected, enhancement_rate)
 
         # Step 3: OCR
-        texts = ExtractorPipline.OCR.method_class().extract(enhanced_img, score_threshold)
+        text, _, _ = ExtractorPipline.OCR.method_class().extract(enhanced_img, score_threshold)
 
-        text = ' '.join(texts)
+        text = ' '.join(text)
         
         # Step 4: Call GEMINIApi
         extract_json = ExtractorPipline.GEMINIApi.method_class(contents=text, wanted_information=wanted_information)

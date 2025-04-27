@@ -10,7 +10,7 @@ class TextImgExtractor():
     def __init__(self,
                  engine: str = "cnocr",  # 'cnocr' or 'paddleocr' engine
                  detection_model_name: str = "en_PP-OCRv3_det",
-                 rec_model_name: str = "n_number_mobile_v2.0"):
+                 rec_model_name: str = "en_number_mobile_v2.0"):
         self.engine = engine.lower()
         self.detection_model_name = detection_model_name
         self.rec_model_name = rec_model_name

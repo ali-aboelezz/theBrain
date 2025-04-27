@@ -44,18 +44,18 @@ class EverythingExtractor():
     def __init__(self):
         pass
 
-    def extract(self, image_path: Union[Image.Image, np.ndarray], 
+    def extract(self, image: Union[Image.Image, np.ndarray], 
                 enhancement_rate: float = 0.5, 
                 score_threshold: float = 0.5,
                 wanted_information: str = 'vendor name, total amount')-> dict:
         # Step 1: Detect the page
-        paper_detected = ExtractorPipline.DetectPage.method_class(PaperDetectionMethodType(2))(img=image_path)
+        paper_detected = ExtractorPipline.DetectPage.method_class(PaperDetectionMethodType(2))(img=image)
         
         # Step 2: Remove background
-        enhanced_img_5 = ExtractorPipline.RemoveBackground.method_class().run(paper_detected, enhancement_rate)
+        enhanced_img = ExtractorPipline.RemoveBackground.method_class().run(paper_detected, enhancement_rate)
 
         # Step 3: OCR
-        texts, _, _ = ExtractorPipline.OCR.method_class().extract(enhanced_img_5, score_threshold)
+        texts = ExtractorPipline.OCR.method_class().extract(enhanced_img, score_threshold)
 
         text = ' '.join(texts)
         

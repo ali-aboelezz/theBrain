@@ -9,6 +9,7 @@ from utils.remove_background import BackgroundRemover
 from utils.llm_api import llm_api
 from utils.image_handler import ImageHandler
 from utils.text_extractor import TextImgExtractor
+from utils.text_handler import TextHandler
 
 import matplotlib.pyplot as plt
 import numpy as np 
@@ -72,4 +73,4 @@ if __name__ == "__main__":
     extract_everything = EverythingExtractor()
     extract_json = extract_everything.extract(image, enhancement_rate=0.5, score_threshold=0.5, wanted_information='vendor name, total amount')
 
-    print(extract_json)
+    print(TextHandler.parse_json2dict(extract_json))

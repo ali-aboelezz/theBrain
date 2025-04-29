@@ -15,6 +15,4 @@ class FilePaths():
         self.paper_seg_model = str(self.paper_seg_model)
         self.data_base_path = str(self.data_base_path)
         self.milvus_db_path = str(self.milvus_db_path)
-    
-
 file_paths = FilePaths()

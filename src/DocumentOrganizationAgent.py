@@ -87,8 +87,8 @@ class DocumentIntelligencePipeline:
     def _setup_email(self):
         self.SMTP_SERVER = "smtp.gmail.com"
         self.SMTP_PORT = 587
-        self.EMAIL_ADDRESS = ""
-        self.APP_PASSWORD = ""
+        self.EMAIL_ADDRESS = "" # the sender email
+        self.APP_PASSWORD = "" #google app password
 
 
 

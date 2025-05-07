@@ -7,11 +7,17 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 from utils.text_extractor import TextImgExtractor
+from config.config import FilePaths
 
 from langchain import LLMChain, PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pymilvus import MilvusClient
 import google.generativeai as genai
+
+from dotenv import load_dotenv
+load_dotenv()
+
+FILE_PATHS = FilePaths()
 
 class DocumentIntelligencePipeline:
     """
@@ -70,6 +76,7 @@ class DocumentIntelligencePipeline:
     """
     def __init__(self):
         # === Setup APIs and Models ===
+        self.milvus_db_path = FILE_PATHS.milvus_db_path
         self._setup_gemini_api()
         self._setup_email()
         self._setup_milvus()
@@ -77,9 +84,8 @@ class DocumentIntelligencePipeline:
         self.text_extractor = TextImgExtractor(engine="paddleocr")
 
     def _setup_gemini_api(self):
-        os.environ["GOOGLE_API_KEY"] = '' #need to add Gemini API Key
-        genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-        self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=500, timeout=None,
+        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+        self.llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0, max_tokens=500, timeout=None,
         max_retries=2,
         seed=42,
         verbose=False)
@@ -93,7 +99,7 @@ class DocumentIntelligencePipeline:
 
 
     def _setup_milvus(self):
-        self.milvus_client = MilvusClient("milvus_demo.db")
+        self.milvus_client = MilvusClient(self.milvus_db_path)
 
     # === OCR Extraction ===
     def extract_text_from_image(self, image_path):

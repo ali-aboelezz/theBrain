@@ -9,6 +9,7 @@ from utils.remove_background import BackgroundRemover
 from utils.llm_api import llm_api
 from utils.image_handler import ImageHandler
 from utils.text_extractor import TextImgExtractor
+from utils.text_handler import TextHandler
 
 import matplotlib.pyplot as plt
 import numpy as np 
@@ -44,20 +45,20 @@ class EverythingExtractor():
     def __init__(self):
         pass
 
-    def extract(self, image_path: Union[Image.Image, np.ndarray], 
+    def extract(self, image: Union[Image.Image, np.ndarray], 
                 enhancement_rate: float = 0.5, 
                 score_threshold: float = 0.5,
                 wanted_information: str = 'vendor name, total amount')-> dict:
         # Step 1: Detect the page
-        paper_detected = ExtractorPipline.DetectPage.method_class(PaperDetectionMethodType(2))(img=image_path)
+        paper_detected = ExtractorPipline.DetectPage.method_class(PaperDetectionMethodType(2))(img=image)
         
         # Step 2: Remove background
-        enhanced_img_5 = ExtractorPipline.RemoveBackground.method_class().run(paper_detected, enhancement_rate)
+        enhanced_img = ExtractorPipline.RemoveBackground.method_class().run(paper_detected, enhancement_rate)
 
         # Step 3: OCR
-        texts, _, _ = ExtractorPipline.OCR.method_class().extract(enhanced_img_5, score_threshold)
+        text, _, _ = ExtractorPipline.OCR.method_class().extract(enhanced_img, score_threshold)
 
-        text = ' '.join(texts)
+        text = ' '.join(text)
         
         # Step 4: Call GEMINIApi
         extract_json = ExtractorPipline.GEMINIApi.method_class(contents=text, wanted_information=wanted_information)
@@ -72,4 +73,4 @@ if __name__ == "__main__":
     extract_everything = EverythingExtractor()
     extract_json = extract_everything.extract(image, enhancement_rate=0.5, score_threshold=0.5, wanted_information='vendor name, total amount')
 
-    print(extract_json)
+    print(TextHandler.parse_json2dict(extract_json))

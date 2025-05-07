@@ -11,7 +11,7 @@ import os
 
 load_dotenv()
 
-gemni_api_key = os.getenv("GEMINI_API_KEY")
+gemni_api_key = os.getenv("GOOGLE_API_KEY")
 
 def llm_api(contents:Optional[str] = None, wanted_information: Optional[str] = None):
     client = genai.Client(api_key=gemni_api_key)

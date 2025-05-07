@@ -9,7 +9,7 @@ def send_email(from_email: str, to_email: str, subject: str, message: str) -> in
     Sends an email using SendGrid API.
     
     Args:
-        from_email (str): Sender email (must be verified in SendGrid).
+        from_email (str): Sender email (must be verified in SendGrid)..
         to_email (str): Recipient email.
         subject (str): Email subject.
         message (str): Email body text.

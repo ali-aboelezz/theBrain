@@ -2,7 +2,7 @@ import os
 import sendgrid
 from sendgrid.helpers.mail import Mail, Email, To, Content
 
-SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")  # Store API key as environment variable
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")  # Store API key as environment variable.
 
 def send_email(from_email: str, to_email: str, subject: str, message: str) -> int:
     """

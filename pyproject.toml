@@ -42,8 +42,11 @@ dependencies = [
     "langchain-google-genai",
     "pymilvus",
     "pytest",
-    "pytest-mock", 
-    "google-generativeai",
+    "pytest-mock",
+    "sendgrid"
+
+    
+    
 
     # Add other dependencies here
     "pymilvus[model]"

@@ -4,6 +4,12 @@ let your office talk
 
 # project structure
 
+to install dependencies
+
+```
+pip install -e .
+```
+
 run the following code in the terminal for linux
 ```
 export PYTHONPATH=$(pwd)

@@ -43,12 +43,7 @@ dependencies = [
     "pymilvus",
     "pytest",
     "pytest-mock",
-    "sendgrid"
-
-    
-    
-
-    # Add other dependencies here
+    "sendgrid",
     "pymilvus[model]"
 ]
 

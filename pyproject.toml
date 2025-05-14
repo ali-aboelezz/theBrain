@@ -44,7 +44,12 @@ dependencies = [
     "pytest",
     "pytest-mock",
     "sendgrid",
-    "pymilvus[model]"
+    "pymilvus[model]", 
+    "reportlab",
+    "timezonefinder",
+    "geopy",
+    "google-generativeai",
+
 ]
 
 [project.optional-dependencies]

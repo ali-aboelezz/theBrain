@@ -1,9 +1,9 @@
 # testGraph.py
 
 from langgraph.graph import StateGraph, END
-from ..testContract import main as contract_main
-from ..testSmartScheduale import MeetingSchedulingAgent
-from ..DocumentOrganizationAgent import DocumentIntelligencePipeline
+from src.testContract import main as contract_main
+from src.testSmartScheduale import MeetingSchedulingAgent
+from src.DocumentOrganizationAgent import DocumentIntelligencePipeline
 from google.generativeai import GenerativeModel
 import google.generativeai as genai
 

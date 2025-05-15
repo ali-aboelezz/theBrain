@@ -12,6 +12,10 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+from config import config
+
+file_paths = config.file_paths
+
 load_dotenv()  # Load .env variables
 
 class MeetingSchedulingAgent:
@@ -24,8 +28,8 @@ class MeetingSchedulingAgent:
 
     def get_calendar_service(self):
         creds = None
-        token_path = 'token.json'
-        credentials_path = os.getenv("GOOGLE_CREDENTIALS_PATH", "credentials.json")
+        token_path = file_paths.google_token_path
+        credentials_path = os.getenv("GOOGLE_CREDENTIALS_PATH", file_paths.google_crenditials_path)
 
         if os.path.exists(token_path):
             with open(token_path, 'rb') as token:

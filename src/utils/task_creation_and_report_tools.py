@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
-from trello import trello
+from utils.trello import trello
 import requests
-from send_notifications import send_email_notification
+from utils.send_notifications import send_email_notification
 from pydantic import BaseModel, Field 
 from typing import Optional, List 
 from langchain_google_genai import ChatGoogleGenerativeAI

@@ -49,6 +49,9 @@ dependencies = [
     "timezonefinder",
     "geopy",
     "google-generativeai",
+    "slack_sdk",
+    "trello",
+    
 
 ]
 

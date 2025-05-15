@@ -7,7 +7,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pymilvus import MilvusClient
 import google.generativeai as genai
 
-from utils.text_extractor import TextImgExtractor
+#from utils.text_extractor import TextImgExtractor
+
 from utils.send_mail import send_email
 from config.config import FilePaths
 
@@ -79,7 +80,7 @@ class DocumentIntelligencePipeline:
         self._setup_gemini_api()
         self._setup_milvus()
         self.col_name = "documents_collection"
-        self.text_extractor = TextImgExtractor(engine="paddleocr")
+       # self.text_extractor = TextImgExtractor(engine="paddleocr")
         self.from_email = os.getenv("SENDER_EMAIL")  # used in send_email()
 
     def _setup_gemini_api(self):
@@ -97,8 +98,9 @@ class DocumentIntelligencePipeline:
     def _setup_milvus(self):
         self.milvus_client = MilvusClient(self.milvus_db_path)
 
+    """
     def extract_text_from_image(self, image_path):
-        return self.text_extractor.extract_text_paddleocr(image_path)
+        return self.text_extractor.extract_text_paddleocr(image_path)   """
 
     def analyze_document(self, text):
         classification_prompt = PromptTemplate(

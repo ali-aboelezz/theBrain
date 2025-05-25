@@ -8,18 +8,20 @@ from timezonefinder import TimezoneFinder
 from geopy.geocoders import Nominatim
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
-
+from  config.config.config import FilePaths
 
 class MeetingSchedulingAgent:
     SCOPES = ['https://www.googleapis.com/auth/calendar']
 
     def __init__(self) -> None:
         print("Initializing Google Calendar API...")
+        self.paths = FilePaths()  # Create an instance
         self.service = self.initialize_google_calendar()
 
     def initialize_google_calendar(self) -> Any:
         try:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', self.SCOPES)
+            creds_path = self.paths.google_credentials_path
+            flow = InstalledAppFlow.from_client_secrets_file(creds_path, self.SCOPES)
             creds = flow.run_local_server(port=3000)
             service = build('calendar', 'v3', credentials=creds)
             print("Google Calendar API initialized.")

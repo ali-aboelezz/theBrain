@@ -15,20 +15,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def pick_file() -> str:
+
+def pick_multiple_files() -> str:
     """
-    Opens a file dialog for the user to select a document.
-    Returns the selected file path or empty string if cancelled.
+    Opens a file dialog for the user to select multiple documents.
+    Returns the selected file paths as a comma-separated string.
     """
     root = tk.Tk()
     root.withdraw()
     root.attributes('-topmost', True)
-    file_path = filedialog.askopenfilename(
-        title="Select a document to process",
+    file_paths = filedialog.askopenfilenames(
+        title="Select documents to process",
         filetypes=[("All files", "*.*")]
     )
     root.destroy()
-    return file_path
+    return ', '.join(file_paths)
 
 
 class DocumentIntelligencePipeline:
@@ -36,7 +37,7 @@ class DocumentIntelligencePipeline:
         self._setup_gemini_api()
         self._setup_milvus()
         self.col_name = "documents_collection"
-        self.text_extractor = TextImgExtractor(engine="cnocr")
+        self.text_extractor = TextImgExtractor()
         self.from_email = os.getenv("SENDER_EMAIL")
 
     def _setup_gemini_api(self):
@@ -52,7 +53,7 @@ class DocumentIntelligencePipeline:
         )
 
     def _setup_milvus(self):
-        self.milvus_client = MilvusClient(uri=os.getenv("MILVUS_URI"))
+        self.milvus_client = MilvusClient(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_TOKEN"), db_name="default")
 
     def extract_text_from_image(self, image_path):
         return self.text_extractor.extract_text_from_image(image_path)
@@ -135,20 +136,11 @@ class DocumentIntelligencePipeline:
 
             file_name, file_format = self.extract_metadata(file_path)
             vector = genai.embed_content(model="models/text-embedding-004", content=text)["embedding"]
-            doc_id = int(uuid.uuid4().int % (2**63))
 
-            if not self.milvus_client.has_collection(collection_name=self.col_name):
-                self.milvus_client.create_collection(
-                    collection_name=self.col_name,
-                    dimension=len(vector),
-                    metric_type="IP",
-                    consistency_level="Strong"
-                )
 
             self.milvus_client.insert(
                 collection_name=self.col_name,
                 data=[{
-                    "id": doc_id,
                     "vector": vector,
                     "category": category,
                     "summary": summary,
@@ -159,7 +151,7 @@ class DocumentIntelligencePipeline:
                 }]
             )
 
-            print(f"✅ Stored {file_name} (Category: {category})")
+            print(f"✅ Stored {file_name} as (Category: {category})")
 
             if receiver_email:
                 self.notify_user(receiver_email, file_name, category)
@@ -170,7 +162,7 @@ class DocumentIntelligencePipeline:
             collection_name=self.col_name,
             data=[embedding],
             limit=1,
-            search_params={"metric_type": "IP", "params": {}},
+            search_params={"metric_type": "COSINE", "params": {}},
             output_fields=["document"]
         )
         return result
@@ -189,13 +181,15 @@ class DocumentIntelligencePipeline:
             choice = input("\nEnter your choice (1-3): ")
 
             if choice == "1":
-                file_path = pick_file()
-                if not file_path or not os.path.isfile(file_path):
-                    print("❌ No valid file selected.")
+                file_paths_input = pick_multiple_files().strip()
+                file_paths = [path.strip() for path in file_paths_input.split(",") if os.path.isfile(path.strip())]
+
+                if not file_paths:
+                    print("❌ No valid file(s) provided.")
                     continue
                 email = input("Enter notification email (or press Enter to skip): ").strip()
                 email = email if email else None
-                self.process_and_store(file_path, email)
+                self.process_and_store(file_paths, email)
 
             elif choice == "2":
                 query = input("\nEnter your search query:\n")

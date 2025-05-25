@@ -7,7 +7,7 @@ from typing import Optional, List, Tuple
 class TextImgExtractor:
     def __init__(self,
                  det_model: str = "en_PP-OCRv3_det",
-                 rec_model: str = "n_number_mobile_v2.0"):
+                 rec_model: str = "en_number_mobile_v2.0"):
         self.ocr = CnOcr(det_model_name=det_model, rec_model_name=rec_model)
 
     def _extract_scores(self, outputs: list, threshold: float = 0.5) -> Tuple[List[float], List[int]]:

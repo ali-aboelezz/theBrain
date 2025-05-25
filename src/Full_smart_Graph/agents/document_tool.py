@@ -1,7 +1,7 @@
 # agents/document_tool.py
 
 from langchain_core.tools import tool
-from docOrganization import DocumentIntelligencePipeline
+from .docOrganization import DocumentIntelligencePipeline
 
 @tool
 def document_organizer() -> str:

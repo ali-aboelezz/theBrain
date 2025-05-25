@@ -12,16 +12,24 @@ from agents.meeting_tool import schedule_meeting
 from agents.document_tool import document_organizer
 from agents.task_tool import task_agent
 
-# Env + Gemini
+
+# ✅ Load environment variables
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key='AIzaSyAcuF1ijVjTCdgbk5jFq09LUHiFiYeiFQo')
+
+# ✅ Use Gemini 2.0 Flash model
 model = genai.GenerativeModel("gemini-2.0-flash")
 
-# Register tools
-tools = [create_contract, schedule_meeting, document_organizer, task_agent]
+# ✅ Register tool agents
+tools = [
+    create_contract,
+    schedule_meeting,
+    document_organizer,
+    task_agent
+]
 tool_node = ToolNode(tools=tools)
 
-# Main agent (intent classifier)
+# ✅ Model logic: detect intent and trigger tool or respond
 def call_model(state: AgentState) -> AgentState:
     messages = state["messages"]
     user_input = messages[-1].content.strip()
@@ -65,16 +73,29 @@ def should_continue(state: AgentState) -> str:
     last_message = state["messages"][-1]
     return "continue" if getattr(last_message, "tool_calls", None) else "end"
 
+def should_continue_after_tool(state: AgentState) -> str:
+    last_message = state["messages"][-1]
+    return "continue" if getattr(last_message, "tool_calls", None) else "end"
+
 # Build graph
 workflow = Graph()
 workflow.set_entry_point("agent")
+
+# Nodes
 workflow.add_node("agent", call_model)
 workflow.add_node("tools", tool_node)
+
+# Conditional edge after model
 workflow.add_conditional_edges("agent", should_continue, {
     "continue": "tools",
     "end": END
 })
-workflow.add_edge("tools", "agent")
+
+# Conditional edge after tool
+workflow.add_conditional_edges("tools", should_continue_after_tool, {
+    "continue": "agent",
+    "end": END
+})
 
 # Compile
 app = workflow.compile()

@@ -12,7 +12,6 @@ import google.generativeai as genai
 from .codeUtils.text_extractor import TextImgExtractor
 from .codeUtils.send_mail import send_email
 from dotenv import load_dotenv
-
 load_dotenv()
 
 

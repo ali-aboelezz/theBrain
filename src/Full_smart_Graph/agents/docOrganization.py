@@ -9,9 +9,10 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pymilvus import MilvusClient
 import google.generativeai as genai
 
-from codeUtils.text_extractor import TextImgExtractor
-from codeUtils.send_mail import send_email
+from .codeUtils.text_extractor import TextImgExtractor
+from .codeUtils.send_mail import send_email
 from dotenv import load_dotenv
+
 load_dotenv()
 
 

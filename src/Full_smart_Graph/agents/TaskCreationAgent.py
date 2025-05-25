@@ -1,12 +1,12 @@
 from dotenv import load_dotenv
-from codeUtils.trello import trello
+from .codeUtils.trello import trello
 import requests
-from codeUtils.send_notifications import send_email_notification
+from .codeUtils.send_notifications import send_email_notification
 from pydantic import BaseModel, Field 
 from typing import Optional, List , Literal
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.output_parsers import PydanticOutputParser
-from codeUtils.task_creation_and_report_tools import create_task, Task,TaskList
+from .codeUtils.task_creation_and_report_tools import create_task, Task,TaskList
 import os 
 
 

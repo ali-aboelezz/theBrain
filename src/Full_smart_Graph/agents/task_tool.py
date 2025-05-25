@@ -1,7 +1,7 @@
 # agents/task_tool.py
 
 from langchain_core.tools import tool
-from TaskCreationAgent import intent_and_board_agent, task_extractor_agent, generate_report
+from .TaskCreationAgent import intent_and_board_agent, task_extractor_agent, generate_report
 
 
 @tool

@@ -15,7 +15,11 @@ from agents.task_tool import task_agent
 
 # ✅ Load environment variables
 load_dotenv()
+<<<<<<< HEAD:src/FullGraph/graph/main_graph.py
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+=======
+genai.configure(api_key='AIzaSyAcuF1ijVjTCdgbk5jFq09LUHiFiYeiFQo')
+>>>>>>> upstream/smartGraph:src/Full_smart_Graph/graph/main_graph.py
 
 # ✅ Use Gemini 2.0 Flash model
 model = genai.GenerativeModel("gemini-2.0-flash")

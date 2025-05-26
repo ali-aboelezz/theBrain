@@ -16,20 +16,13 @@ load_dotenv()
 
 
 
-def pick_multiple_files() -> str:
-    """
-    Opens a file dialog for the user to select multiple documents.
-    Returns the selected file paths as a comma-separated string.
-    """
+def get_multiple_file_paths():
+    """Opens a dialog to select multiple files and returns their paths."""
     root = tk.Tk()
-    root.withdraw()
-    root.attributes('-topmost', True)
-    file_paths = filedialog.askopenfilenames(
-        title="Select documents to process",
-        filetypes=[("All files", "*.*")]
-    )
-    root.destroy()
-    return ', '.join(file_paths)
+    root.withdraw()  # Hide the main window
+    file_paths = filedialog.askopenfilenames()
+    return file_paths
+
 
 
 class DocumentIntelligencePipeline:
@@ -181,8 +174,8 @@ class DocumentIntelligencePipeline:
             choice = input("\nEnter your choice (1-3): ")
 
             if choice == "1":
-                file_paths_input = pick_multiple_files().strip()
-                file_paths = [path.strip() for path in file_paths_input.split(",") if os.path.isfile(path.strip())]
+                file_paths = get_multiple_file_paths()
+                file_paths = [path for path in file_paths if os.path.isfile(path)]
 
                 if not file_paths:
                     print("❌ No valid file(s) provided.")
